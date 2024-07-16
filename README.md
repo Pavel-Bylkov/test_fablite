@@ -283,7 +283,7 @@ flask db upgrade
 5. Запустите Flask приложение:
 
 ```
-python app/run.py
+python run.py
 ```
 
 6. Проверьте работу приложения с помощью команды:
