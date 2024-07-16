@@ -134,8 +134,7 @@
 
 ```json
 {
-  "message": "Member added successfully",
-  "member_login": "petr.petrov@mail.ru"
+  "message": "Member added successfully"
 }
 ```
 
