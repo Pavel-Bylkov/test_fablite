@@ -1,6 +1,7 @@
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
+
 # Конфигурация базы данных
 DB_NAME = "test_fablite"
 DB_USER = "test_user"

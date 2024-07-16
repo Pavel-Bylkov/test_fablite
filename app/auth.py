@@ -3,10 +3,46 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.models import db, User
 
+
 auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
+    """
+    Регистрация нового пользователя.
+    ---
+    parameters:
+      - name: email
+        in: body
+        type: string
+        required: true
+        description: Email пользователя
+      - name: password
+        in: body
+        type: string
+        required: true
+        description: Пароль пользователя
+      - name: role
+        in: body
+        type: string
+        required: false
+        description: Роль пользователя
+      - name: name
+        in: body
+        type: string
+        required: false
+        description: Имя пользователя
+      - name: surname
+        in: body
+        type: string
+        required: false
+        description: Фамилия пользователя
+    responses:
+      201:
+        description: Пользователь успешно зарегистрирован
+      400:
+        description: Пользователь уже существует или неверный запрос
+    """
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')
@@ -26,6 +62,26 @@ def register():
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
+    """
+    Вход пользователя.
+    ---
+    parameters:
+      - name: email
+        in: body
+        type: string
+        required: true
+        description: Email пользователя
+      - name: password
+        in: body
+        type: string
+        required: true
+        description: Пароль пользователя
+    responses:
+      200:
+        description: Успешный вход
+      401:
+        description: Неверные учетные данные
+    """
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')
@@ -40,6 +96,13 @@ def login():
 @auth_bp.route('/protected', methods=['GET'])
 @jwt_required()
 def protected():
+    """
+    Получение защищенной информации пользователя.
+    ---
+    responses:
+      200:
+        description: Успешное получение информации
+    """
     current_user_id = get_jwt_identity()
     user = User.query.get(current_user_id)
     return jsonify({"email": user.email}), 200

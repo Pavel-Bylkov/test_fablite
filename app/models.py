@@ -1,5 +1,6 @@
 from app import db
 
+
 # Сводная таблица для хранения отношений между пользователями и командами
 user_team = db.Table('user_team',
     db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),

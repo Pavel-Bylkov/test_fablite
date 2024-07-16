@@ -4,12 +4,29 @@ from werkzeug.security import generate_password_hash
 from app.models import db, User, Team
 from app.utils import validate_json
 
+
 routes_bp = Blueprint('routes', __name__)
+
 
 @routes_bp.route('/new_team', methods=['POST'])
 @jwt_required()
 @validate_json('team_name')
 def new_team():
+    """
+    Создание новой команды.
+    ---
+    parameters:
+      - name: team_name
+        in: body
+        type: string
+        required: true
+        description: Название команды
+    responses:
+      201:
+        description: Команда успешно создана
+      400:
+        description: Название команды уже существует или неверный запрос
+    """
     data = request.get_json()
     team_name = data.get('team_name')
     leader_id = get_jwt_identity()
@@ -31,9 +48,40 @@ def new_team():
         "invite_link": f"http://site.ru/{team_name}/add_member"
     }), 201
 
+
 @routes_bp.route('/<name_team>/add_member', methods=['POST'])
 @validate_json('name', 'surname', 'email', 'password')
 def add_member(name_team):
+    """
+    Добавление нового участника в команду.
+    ---
+    parameters:
+      - name: name
+        in: body
+        type: string
+        required: true
+        description: Имя участника
+      - name: surname
+        in: body
+        type: string
+        required: true
+        description: Фамилия участника
+      - name: email
+        in: body
+        type: string
+        required: true
+        description: Email участника
+      - name: password
+        in: body
+        type: string
+        required: true
+        description: Пароль участника
+    responses:
+      201:
+        description: Участник успешно добавлен
+      400:
+        description: Участник уже существует или неверный запрос
+    """
     data = request.get_json()
     name = data.get('name')
     surname = data.get('surname')
@@ -50,14 +98,36 @@ def add_member(name_team):
     hashed_password = generate_password_hash(password)
     new_user = User(name=name, surname=surname, email=email, password=hashed_password, role='member')
     new_user.teams.append(team)
+    team.members.append(new_user)
     db.session.add(new_user)
     db.session.commit()
 
     return jsonify({"message": "Member added successfully"}), 201
 
+
 @routes_bp.route('/<name_team>/<user_email>', methods=['DELETE'])
 @jwt_required()
 def delete_user(name_team, user_email):
+    """
+    Удаление пользователя из команды.
+    ---
+    parameters:
+      - name: name_team
+        in: path
+        type: string
+        required: true
+        description: Название команды
+      - name: user_email
+        in: path
+        type: string
+        required: true
+        description: Email пользователя
+    responses:
+      200:
+        description: Пользователь успешно удален
+      400:
+        description: Пользователь не найден или нет доступа
+    """
     current_user_id = get_jwt_identity()
     current_user = User.query.get(current_user_id)
     user_to_delete = User.query.filter_by(email=user_email).first()
@@ -87,10 +157,31 @@ def delete_user(name_team, user_email):
 
     return jsonify({"message": "User removed from team successfully"}), 200
 
+
 @routes_bp.route('/<name_team>/<user_email>/profile', methods=['PUT'])
 @jwt_required()
 @validate_json('name', 'surname')
 def update_profile(name_team, user_email):
+    """
+    Обновление профиля пользователя.
+    ---
+    parameters:
+      - name: name
+        in: body
+        type: string
+        required: true
+        description: Имя пользователя
+      - name: surname
+        in: body
+        type: string
+        required: true
+        description: Фамилия пользователя
+    responses:
+      200:
+        description: Профиль успешно обновлен
+      400:
+        description: Пользователь не найден или нет доступа
+    """
     current_user_id = get_jwt_identity()
     current_user = User.query.get(current_user_id)
     user_to_update = User.query.filter_by(email=user_email).first()
@@ -108,8 +199,24 @@ def update_profile(name_team, user_email):
 
     return jsonify({"message": "Profile updated successfully"}), 200
 
+
 @routes_bp.route('/<name_team>', methods=['GET'])
 def get_team_members(name_team):
+    """
+    Получение списка участников команды.
+    ---
+    parameters:
+      - name: name_team
+        in: path
+        type: string
+        required: true
+        description: Название команды
+    responses:
+      200:
+        description: Информация о членах команды
+      404:
+        description: Команда не найдена
+    """
     team = Team.query.filter_by(name=name_team).first()
 
     if not team:
