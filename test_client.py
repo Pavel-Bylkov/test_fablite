@@ -102,10 +102,10 @@ def get_team_members(team_name):
 
 if __name__ == "__main__":
     # Регистрация пользователя
-    register_user("testuser@example.com", "testpassword", "Иван", "Иванов")
+    register_user("testuser@mail.ru", "testpassword", "Иван", "Иванов")
 
     # Вход пользователя
-    token = login_user("testuser@example.com", "testpassword")
+    token = login_user("testuser@mail.ru", "testpassword")
 
     if token:
         # Создание команды

@@ -31,7 +31,7 @@
 **Пример запроса:**
 ```json
 {
-"email": "testuser@example.com",
+"email": "testuser@mail.ru",
 "password": "testpassword"
 }
 ```
@@ -54,7 +54,7 @@
 **Пример запроса:**
 ```json
 {
-"email": "testuser@example.com",
+"email": "testuser@mail.ru",
 "password": "testpassword"
 }
 ```
@@ -196,7 +196,7 @@
 1. Убедитесь, что PostgreSQL запущен и настроен:
 Установите PostgreSQL, если он еще не установлен. 
 Инструкции по установке можно найти на официальном сайте PostgreSQL: https://www.postgresql.org/download/
-Проверьте, что база данных test_fablite создана и пользователь test_user имеет к ней доступ.
+
 2. Активируйте виртуальное окружение:
 На Windows: 
 ```
@@ -210,15 +210,27 @@ source venv/bin/activate
 ```
 pip install -r requirements.txt
 ```
-4. Запустите скрипт для настройки базы данных и добавления тестовых данных:
+4. Запустите скрипт для настройки базы данных:
+Проверьте, что база данных test_fablite создана и пользователь test_user имеет к ней доступ.
+```commandline
+python app/create_db.py
 ```
-python app/setup_db.py
+Выполните миграции для базы данных
+```commandline
+rm -r migrations
+flask db init
+flask db migrate -m "Initial migration"
+flask db upgrade
 ```
 5. Запустите Flask приложение:
 ```
 python app/run.py
 ```
-6. Проверьте работу приложения с помощью cURL или Postman:
+6. Проверьте работу приложения с помощью команды:
+```
+python test_client.py
+```
+или вручную с помощью cURL или Postman:
 ### Примеры запросов
 
 #### 1. Регистрация пользователя
